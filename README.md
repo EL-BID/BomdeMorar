@@ -1,3 +1,5 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=EL-BID_BomdeMorar&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=EL-BID_BomdeMorar)
+
 # PoC Programa Bom de Morar
 
 ![Figura 1: Tela inicial](www/screen0.png)
