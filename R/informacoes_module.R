@@ -1,3 +1,8 @@
+#' Informações UI
+#'
+#' @import shiny
+#'
+#' @export
 
 informacoesUI = function(id) {
     ns = NS(id)
@@ -60,6 +65,10 @@ informacoesUI = function(id) {
         )
 }
 
+#' Informações Server
+#'
+#' @import shiny
+#'
 informacoesServer = function(id) {
     moduleServer(
         id,
