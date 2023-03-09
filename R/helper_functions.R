@@ -1,64 +1,97 @@
-# Função para filtrar solicitante do cadunico
+#' Função para buscar informação de indivíduos no CadÚnico
+#' 
+#' @description 
+#' Essa função irá buscar as informações socio demográficas do CPF na base do CadÚnico.
+#' 
+#' @param cpf caractere com número do CPF do indivíduo. Esse número possui 11 digitos.
+#' @param file_path endereço do arquivo da base do CadÚnico. Default para "data/cadunico/.
+#' 
+#' @importFrom dplyr %>%
+#' 
+#' @export
+
 getInfoCAD_CPF = function(cpf, 
                           file_path = "data/cadunico/") { 
-    library(arrow)
-    library(dplyr)
+    
     # Filtering for CPF:
-    open_dataset(sources = file_path) %>% 
-    filter(p.num_cpf_pessoa == cpf) %>% 
-    select(p.ref_cad,                  # data de referencia do CAD
-           d.dat_atual_fam,            # data da ultima atualizacao da família
-           d.cod_familiar_fam,         # codigo da família
-           p.cod_parentesco_rf_pessoa, # Relacao de parentesco com o responsavel familiar
-           p.nom_pessoa,               # nome completo do solicitante
-           p.dta_nasc_pessoa,          # data de nascimento do solicitante
-           p.num_cpf_pessoa,           # numero do cpf do solicitante
-           p.num_nis_pessoa_atual,     # numero nis do solicitante
-           d.nom_tip_logradouro_fam,   # rua, avenida, etc
-           d.nom_logradouro_fam,       # nome da rua/avenida
-           d.num_logradouro_fam,       # numero da casa
-           d.nom_localidade_fam,       # nome do bairro
-           d.vlr_renda_total_fam,      # renda total da família
-           d.vlr_renda_media_fam) %>% 
-    collect()
+    arrow::open_dataset(sources = file_path) %>% 
+    dplyr::filter(p.num_cpf_pessoa == cpf) %>% 
+    dplyr::select(p.ref_cad,                  # data de referencia do CAD
+                  d.dat_atual_fam,            # data da ultima atualizacao da família
+                  d.cod_familiar_fam,         # codigo da família
+                  p.cod_parentesco_rf_pessoa, # Relacao de parentesco com o responsavel familiar
+                  p.nom_pessoa,               # nome completo do solicitante
+                  p.dta_nasc_pessoa,          # data de nascimento do solicitante
+                  p.num_cpf_pessoa,           # numero do cpf do solicitante
+                  p.num_nis_pessoa_atual,     # numero nis do solicitante
+                  d.nom_tip_logradouro_fam,   # rua, avenida, etc
+                  d.nom_logradouro_fam,       # nome da rua/avenida
+                  d.num_logradouro_fam,       # numero da casa
+                  d.nom_localidade_fam,       # nome do bairro
+                  d.vlr_renda_total_fam,      # renda total da família
+                  d.vlr_renda_media_fam) %>% 
+        dplyr::collect()
 }
 
-# Função para filtrar solicitante do cadunico
+#' Função para buscar informação de indivíduos no CadÚnico
+#' 
+#' @description 
+#' Essa função irá buscar as informações socio demográficas do NIS na base do CadÚnico.
+#' 
+#' @param nis caractere com número do CPF do indivíduo. Esse número possui 11 digitos.
+#' @param file_path endereço do arquivo da base do CadÚnico. Default para "data/cadunico/.
+#' 
+#' @importFrom dplyr %>%
+#' 
+#' @export
+
 getInfoCAD_NIS = function(nis, 
                           file_path = "data/cadunico/") { 
-    library(arrow)
-    library(dplyr)
-    # Filtering for CPF:
-    open_dataset(sources = file_path) %>% 
-    filter(p.num_nis_pessoa_atual == nis) %>% 
-    select(p.ref_cad,                  # data de referencia do CAD
-           d.dat_atual_fam,            # data da ultima atualizacao da família
-           d.cod_familiar_fam,         # codigo da família
-           p.cod_parentesco_rf_pessoa, # Relacao de parentesco com o responsavel familiar
-           p.nom_pessoa,               # nome completo do solicitante
-           p.dta_nasc_pessoa,          # data de nascimento do solicitante
-           p.num_cpf_pessoa,           # numero do cpf do solicitante
-           p.num_nis_pessoa_atual,     # numero nis do solicitante
-           d.nom_tip_logradouro_fam,   # rua, avenida, etc
-           d.nom_logradouro_fam,       # nome da rua/avenida
-           d.num_logradouro_fam,       # numero da casa
-           d.nom_localidade_fam,       # nome do bairro
-           d.vlr_renda_total_fam,      # renda total da família
-           d.vlr_renda_media_fam) %>% 
-    collect()
+    # open connection to parquet file:
+    arrow::open_dataset(sources = file_path) %>% 
+    # Filtering for NIS:
+    dplyr::filter(p.num_nis_pessoa_atual == nis) %>% 
+    dplyr::select(
+        p.ref_cad,                  # data de referencia do CAD
+        d.dat_atual_fam,            # data da ultima atualizacao da família
+        d.cod_familiar_fam,         # codigo da família
+        p.cod_parentesco_rf_pessoa, # Relacao de parentesco com o responsavel familiar
+        p.nom_pessoa,               # nome completo do solicitante
+        p.dta_nasc_pessoa,          # data de nascimento do solicitante
+        p.num_cpf_pessoa,           # numero do cpf do solicitante
+        p.num_nis_pessoa_atual,     # numero nis do solicitante
+        d.nom_tip_logradouro_fam,   # rua, avenida, etc
+        d.nom_logradouro_fam,       # nome da rua/avenida
+        d.num_logradouro_fam,       # numero da casa
+        d.nom_localidade_fam,       # nome do bairro
+        d.vlr_renda_total_fam,      # renda total da família
+        d.vlr_renda_media_fam
+    ) %>% 
+        dlpyr::collect()
 }
 
+#' Função para buscar informações de famílias no CadÚnico
+#' 
+#' @description 
+#' Essa função irá buscar as informações de todos membros da família na base 
+#' do CadÚnico a partir de seu código de identificação.
+#' 
+#' @param cod_familiar caractere com o código de identificação da família no CadÚnico
+#' @param file_path endereço do arquivo da base do CadÚnico. Default para "data/cadunico/.
+#' 
+#' @importFrom dplyr %>%
+#' 
+#' @export
 
-# Função para retornar todos membros da família do solicitante 
-# (incluindo o solicitante) usando o cadunico:
 getFamilyCAD <- function(cod_familiar,
                          file_path = "data/cadunico"){
-    library(arrow)
-    library(dplyr)
+    
+    # open connection to parquet file:
+    arrow::open_dataset(sources = file_path) %>% 
     # Filtering for cod_familiar:
-    open_dataset(sources = file_path) %>% 
-    filter(d.cod_familiar_fam == cod_familiar) %>% 
-    select( 
+    dplyr::filter(d.cod_familiar_fam == cod_familiar) %>% 
+    # selecting columns:
+    dplyr::select( 
         p.ref_cad,                    # data de referencia do CAD
         d.dat_atual_fam,              # data da ultima atualizacao da familia
         d.cod_familiar_fam,           # codigo da família
@@ -79,187 +112,317 @@ getFamilyCAD <- function(cod_familiar,
         d.cod_material_domic_fam,     # material predominante nas paredes externas do domicílio
         d.qtd_familias_domic_fam      # quantidade de familias no domicilio
     ) %>% 
-    collect()
+    dplyr::collect()
 }
 
-
-# Função para checar se há o solicitante está inscrito no CadUnico:
+#' Função para checar inscrição no CadUnico
+#' 
+#' @description 
+#' Essa função irá analisar se o CPF informado está inscrito no CadUnico.
+#' 
+#' @param cpf caracter com o número do CPF.
+#' @param file_path endereço do arquivo da base do CadÚnico. Default para "data/cadunico/.
+#' 
+#' @importFrom dplyr %>%
+#' 
+#' @export
+ 
 checkCAD_CPF = function(cpf,
                         file_path = "data/cadunico/") {
+
     
-    library(arrow)
-    library(dplyr)
-    # Filtering for CPF:
-    flag = open_dataset(sources = file_path) %>% 
-        filter(p.num_cpf_pessoa == cpf) %>% 
-        select(
-            d.cod_familiar_fam, # codigo da família
-            p.nom_pessoa, # nome completo do solicitante
-            p.dta_nasc_pessoa, # data de nascimento do solicitante
-            p.num_cpf_pessoa,   # numero do cpf
+    flag = arrow::open_dataset(sources = file_path) %>% 
+        # Filtering for CPF:
+        dplyr::filter(p.num_cpf_pessoa == cpf) %>% 
+        # selecting columns:
+        dplyr::select(
+            d.cod_familiar_fam,    # codigo da família
+            p.nom_pessoa,          # nome completo do solicitante
+            p.dta_nasc_pessoa,     # data de nascimento do solicitante
+            p.num_cpf_pessoa,      # numero do cpf
             p.num_nis_pessoa_atual # numero nis do solicitante
         ) %>%
-        compute() |> 
+        dplyr::compute() |> 
+        # count number of rows:
         nrow()
+    # check if there is return:
     flag > 0
 }
 
+#' Função para checar inscrição no CadUnico
+#' 
+#' @description 
+#' Essa função irá analisar se o NIS informado está inscrito no CadUnico.
+#' 
+#' @param nis caracter com o número do NIS.
+#' @param file_path endereço do arquivo da base do CadÚnico. Default para "data/cadunico/.
+#' 
+#' @importFrom dplyr %>%
+#' 
+#' @export
 
 checkCAD_NIS = function(nis,
                         file_path = "data/cadunico/") {
-    library(arrow)
-    library(dplyr)
-    # Filtering for CPF:
-    flag = open_dataset(sources = file_path) %>% 
-        filter(p.num_nis_pessoa_atual == nis) %>% 
-        select(
+    
+    flag = arrow::open_dataset(sources = file_path) %>% 
+        # Filtering for NIS:
+        dplyr::filter(p.num_nis_pessoa_atual == nis) %>% 
+        # selecting columns:
+        dplyr::select(
             d.cod_familiar_fam, # codigo da família
             p.nom_pessoa, # nome completo do solicitante
             p.dta_nasc_pessoa, # data de nascimento do solicitante
             p.num_cpf_pessoa,   # numero do cpf
             p.num_nis_pessoa_atual # numero nis do solicitante
         ) %>%
-        compute() |> 
+        dplyr::compute() |> 
         nrow()
     flag > 0
 }
 
-# Função para checar se há membro com idade acima de 18 anos na família
-# a partir das informações do CAD:
+#' Checar adulto na família
+#'
+#' @description 
+#' Essa função irá checar se há algum membro na família com idade acima de 
+#' 18 anos a partir das informações do CadÚnico.
+#' 
+#' @param family base de dados com informações de todos os membros da família.
+#' 
+#' @importFrom lubridate %--%
+#' 
+#' @export
+
 checkAnyAdultFamily <- function(family) {
     # calculando idade de cada membro:
     familyInfo = family |> 
-        mutate(idade = trunc((p.dta_nasc_pessoa %--% today())/ years(1)))
+        dplyr::mutate(idade = trunc((p.dta_nasc_pessoa %--% lubridate::today())/ lubridate::years(1)))
     # checando se existe alguém com idade acima de 18 anos:
     any(familyInfo$idade > 18)
 }
 
+#' Checar recebimento de auxílio Moradia
+#' 
+#' @description 
+#' Essa função irá checar se há algum membro da família que recebe benefício do 
+#' Programa Auxílio Moradia.
+#' 
+#' @details 
+#' Essa função realizará uma operação de `join` junto a base do programa Auxílio
+#' Moradia utilizando a informação do CPF do indivíduo.
+#' 
+#' @param family base de dados com informações de todos os membros da família.
+#' @param file_path caminho para o arquivo da base de auxilio moradia. 
+#' 
+#' @export
 
-# Função para checar se há algum membro da família que recebe benefício do 
-# Programa Auxílio Moradia:
 checkAuxilioMoradia_NIS <- function(family, 
                                 file_path = "data/auxilioMoradia/") {
     
     # pegando os indivíduos ativos do programa Auxilio Moradia
-    flag = open_dataset(file_path) |> 
-        filter(`ATIVO` == "sim") |> 
+    flag = arrow::open_dataset(file_path) |> 
+        dplyr::filter(`ATIVO` == "sim") |> 
         # merge by NIS:
-        inner_join(
+        dplyr::inner_join(
             family, 
             by = c("NIS" = "p.num_nis_pessoa_atual")
         ) |> 
-        compute() |> 
+        dplyr::compute() |> 
         nrow()
     
     flag > 0
 }
 
-# Função para checar se há algum membro da família que recebe benefício do 
-# Programa Auxílio Moradia:
+#' Checar recebimento de auxílio Moradia
+#' 
+#' @description 
+#' Essa função irá checar se há algum membro da família que recebe benefício do 
+#' Programa Auxílio Moradia.
+#' 
+#' @details 
+#' Essa função realizará uma operação de `join` junto a base do programa Auxílio
+#' Moradia utilizando a informação do NIS do indivíduo.
+#' 
+#' @param family base de dados com informações de todos os membros da família.
+#' @param file_path caminho para o arquivo da base de auxilio moradia. 
+#' 
+#' @export
+
 checkAuxilioMoradia_CPF <- function(family, 
                                     file_path = "data/auxilioMoradia/") {
     
     # pegando os indivíduos ativos do programa Auxilio Moradia
-    flag = open_dataset(file_path) |> 
-        filter(`ATIVO` == "sim") |> 
+    flag = arrow::open_dataset(file_path) |> 
+        dplyr::filter(`ATIVO` == "sim") |> 
         # merge by CPF:
-        inner_join(
+        dplyr::inner_join(
             family, 
             by = c("CPF" = "p.num_cpf_pessoa")
         ) |> 
-        compute() |> 
+        dplyr::compute() |> 
         nrow()
     
     flag > 0
 }
 
-# Função para checar se há algum membro da família que recebe benefício do 
-# Programa Auxílio Moradia:
+
+#' Checar recebimento de auxílio Moradia
+#' 
+#' @description 
+#' Essa função irá checar se há algum membro da família que recebe benefício do 
+#' Programa Auxílio Moradia.
+#' 
+#' @details 
+#' Essa função realizará uma operação de `join` junto a base do programa Auxílio
+#' Moradia utilizando a informação de `nome` e `data de nascimento` do indivíduo.
+#' 
+#' @param family base de dados com informações de todos os membros da família.
+#' @param file_path caminho para o arquivo da base de auxilio moradia. 
+#' 
+#' @export
+
 checkAuxilioMoradia_NomeDtaNasc <- function(family, 
                                             file_path = "data/auxilioMoradia/") {
     
     # pegando os indivíduos ativos do programa Auxilio Moradia
-    flag = open_dataset(file_path) |> 
-        filter(`ATIVO` == "sim") |> 
+    flag = arrow::open_dataset(file_path) |> 
+        dplyr::filter(`ATIVO` == "sim") |> 
         # merge by Nome e Data de Nascimento:
-        inner_join(
+        dplyr::inner_join(
             family, 
             by = c("NOME" = "p.nom_pessoa",
                    "DATA NASCIMENTO" = "p.dta_nasc_pessoa")
         ) |> 
-        compute() |> 
+        dplyr::compute() |> 
         nrow()
     
     flag > 0
 }
 
-# Função para checar se há algum membro da família que recebe benefício do 
-# Programa Auxílio Acolhida (Antigo Aluguel Social):
+
+#' Checar Recebimento de Auxílio Acolhida
+#' 
+#' @description 
+#' Essa função irá checar se há algum membro da família que recebe benefício do 
+#' Programa Auxílio Acolhida (Antigo Aluguel Social):
+#' 
+#' @details 
+#' Essa função realizará uma operação de `join` junto a base do programa Auxílio
+#' Acolhida utilizando a informação do número `NIS` do indivíduo.
+#' 
+#' @param family base de dados com informações de todos os membros da família.
+#' @param file_path caminho para o arquivo da base de auxilio moradia. 
+#' 
+#' @export
+
 checkAuxilioAcolhida_NIS <- function(family, 
                                      file_path = "data/auxilioAcolhida/") {
     
-    flag = open_dataset(file_path) |> 
-        filter(`SITUACAO DO BENEFICIO` == "ATIVO") |> 
-        select(`USUARIO`, `DATA DE NASC.`, `CPF`, `NIS`) |> 
+    flag = arrow::open_dataset(file_path) |> 
+        dplyr::filter(`SITUACAO DO BENEFICIO` == "ATIVO") |> 
+        dplyr::select(`USUARIO`, `DATA DE NASC.`, `CPF`, `NIS`) |> 
         # merge by NIS:
-        inner_join(
+        dplyr::inner_join(
             family, 
             by = c("NIS" = "p.num_nis_pessoa_atual")
         ) |> 
-        compute() |> 
+        dplyr::compute() |> 
         nrow()
     
     flag > 0
 }
 
-# Função para checar se há algum membro da família que recebe benefício do 
-# Programa Auxílio Acolhida (Antigo Aluguel Social):
+#' Checar Recebimento de Auxílio Acolhida
+#' 
+#' @description 
+#' Essa função irá checar se há algum membro da família que recebe benefício do 
+#' Programa Auxílio Acolhida (Antigo Aluguel Social):
+#' 
+#' @details 
+#' Essa função realizará uma operação de `join` junto a base do programa Auxílio
+#' Acolhida utilizando a informação do número `CPF` do indivíduo.
+#' 
+#' @param family base de dados com informações de todos os membros da família.
+#' @param file_path caminho para o arquivo da base de auxilio moradia. 
+#' 
+#' @export
+
 checkAuxilioAcolhida_CPF <- function(family, 
                                  file_path = "data/auxilioAcolhida/") {
     
-    flag = open_dataset(file_path) |> 
-        filter(`SITUACAO DO BENEFICIO` == "ATIVO") |> 
-        select(`USUARIO`, `DATA DE NASC.`, `CPF`, `NIS`) |> 
+    flag = arrow::open_dataset(file_path) |> 
+        dplyr::filter(`SITUACAO DO BENEFICIO` == "ATIVO") |> 
+        dplyr::select(`USUARIO`, `DATA DE NASC.`, `CPF`, `NIS`) |> 
         # merge by CPF:
-        inner_join(
+        dplyr::inner_join(
             family, 
             by = c("CPF" = "p.num_cpf_pessoa")
         ) |> 
-        compute() |> 
+        dplyr::compute() |> 
         nrow()
     
     flag > 0
 }
 
-# Função para checar se há algum membro da família que recebe benefício do 
-# Programa Auxílio Acolhida (Antigo Aluguel Social):
+#' Checar Recebimento de Auxílio Acolhida
+#' 
+#' @description 
+#' Essa função irá checar se há algum membro da família que recebe benefício do 
+#' Programa Auxílio Acolhida (Antigo Aluguel Social):
+#' 
+#' @details 
+#' Essa função realizará uma operação de `join` junto a base do programa Auxílio
+#' Acolhida utilizando a informação do `Nome` e `Data de Nascimento` do indivíduo.
+#' 
+#' @param family base de dados com informações de todos os membros da família.
+#' @param file_path caminho para o arquivo da base de auxilio moradia. 
+#' 
+#' @export
+
 checkAuxilioAcolhida_NomeDtaNasc <- function(family, 
                                              file_path = "data/auxilioAcolhida/") {
     
-    flag = open_dataset(file_path) |> 
-        filter(`SITUACAO DO BENEFICIO` == "ATIVO") |> 
-        select(`USUARIO`, `DATA DE NASC.`, `CPF`, `NIS`) |> 
+    flag = arrow::open_dataset(file_path) |> 
+        dplyr::filter(`SITUACAO DO BENEFICIO` == "ATIVO") |> 
+        dplyr::select(`USUARIO`, `DATA DE NASC.`, `CPF`, `NIS`) |> 
         # Merge by Nome e data de nascimento
-        inner_join(
+        dplyr::inner_join(
             family, 
             by = c("USUARIO" = "p.nom_pessoa",
                    "DATA DE NASC." = "p.dta_nasc_pessoa")
         ) |> 
-        compute() |> 
+        dplyr::compute() |> 
         nrow()
     
     flag > 0
 }
 
-# Função para checar se o cadastro foi atualizado nos últimos 24 meses:
+#' Checar Atualização de Cadastro no CadÚnico
+#' 
+#' @description 
+#' Função para checar se o cadastro foi atualizado nos últimos 24 meses:
+#' 
+#' @param dtaAtualizacaoCadastral data da última atualização cadastral
+#' @param dtaRefCad data de referência do CAD
+#' @param updated_within_months número de meses para checar atualização.
+#' Default para 24 meses.
+#' 
+#' @importFrom lubridate %m-%
+#' @export
+
 checkCadastroAtualizadoCAD <- function(dtaAtualizacaoCadastral, dtaRefCad, updated_within_months = 24) {
-    library(lubridate)
     flag = dtaAtualizacaoCadastral >= (dtaRefCad %m-% months(updated_within_months) )
     flag 
 }
 
+#' Checar Elegibilidade do indivíduo.
+#' 
+#' @description 
+#' Função para checar elegibilidade ao programa utilizando o CPF:
+#' 
+#' @param cpf número de cpf do indivíduos
+#' 
+#' @export
 
-# Função para checar elegibilidade ao programa utilizando o CPF:
 checkElegibility_CPF = function(cpf) {
 
     # I. ser residente do município do Recife, há pelo menos 02 anos:
@@ -349,7 +512,7 @@ checkElegibility_CPF = function(cpf) {
                     } else {
                         out = list(
                             resultado = "inelegivel",
-                            motivo = case_when(
+                            motivo = dplyr::case_when(
                                 recebeAuxilioAcolhida ~ "Beneficiário do programa Auxílio Acolhida",
                                 recebeAuxilioMoradia  ~ "Beneficiário do programa Auxílio Moradia"
                             ),
@@ -406,7 +569,15 @@ checkElegibility_CPF = function(cpf) {
 }
 
 
-# Função para checar elegibilidade ao programa utilizando o NIS:
+#' Checar Elegibilidade do indivíduo.
+#' 
+#' @description 
+#' Função para checar elegibilidade ao programa utilizando o `NIS`.
+#' 
+#' @param nis número de `NIS` do indivíduo
+#' 
+#' @export
+
 checkElegibility_NIS = function(nis) {
 
     # I. ser residente do município do Recife, há pelo menos 02 anos:
@@ -540,6 +711,16 @@ checkElegibility_NIS = function(nis) {
     return( out )
 }
 
+#' Função para Calcular Subsídio.
+#' 
+#' @description 
+#' Essa função para calcular a modalidade do programa e valor do subsídio.
+#' 
+#' @param infoFamily dataframe com as informações da família extraídas do CadUnico
+#' @param SM Valor do salário mínimo
+#' @param SUBSIDIO_MIN valor do subsídio mínimo
+#' @param SUBSIDIO_MAX valor do subsídio máximo
+#' @param ALGUEL_MAX valor do aluguel máximo
 
 playProgramaBomDeMorar = function(infoFamily, SM, SUBSIDIO_MIN, SUBSIDIO_MAX, ALUGUEL_MAX) {
     
@@ -552,22 +733,26 @@ playProgramaBomDeMorar = function(infoFamily, SM, SUBSIDIO_MIN, SUBSIDIO_MAX, AL
     # qual modalidade do programa bom de Morar?
     
     # check mora em domicilio rustico (domicilio sem parede de alvenaria ou madeira aparelhada):
-    infoFamily = infoFamily |> mutate(domicilio_rustico = !(d.cod_material_domic_fam %in% c(1, 2)))
+    infoFamily = infoFamily |> 
+        dplyr::mutate(domicilio_rustico = !(d.cod_material_domic_fam %in% c(1, 2)))
     infoFamily
     
     # check area de intervenção municipal:
-    infoFamily = infoFamily |> mutate(area_intervencao = TRUE)
+    infoFamily = infoFamily |> 
+        dplyr::mutate(area_intervencao = TRUE)
     
     # check ônus excessivo:
-    infoFamily = infoFamily |> mutate(onus_excessivo = d.val_desp_aluguel_fam > 0.3*d.vlr_renda_total_fam)
+    infoFamily = infoFamily |> 
+        dplyr::mutate(onus_excessivo = d.val_desp_aluguel_fam > 0.3*d.vlr_renda_total_fam)
     
     # check coabitação involuntária:
-    infoFamily = infoFamily |> mutate(coabitacao_involuntaria = d.qtd_familias_domic_fam > 1)
+    infoFamily = infoFamily |> 
+        dplyr::mutate(coabitacao_involuntaria = d.qtd_familias_domic_fam > 1)
     infoFamily
     
     # determinando modalidade do programa:
     infoFamily = infoFamily |> 
-        mutate(modalidade = case_when(
+        dplyr::mutate(modalidade = dplyr::case_when(
             any(domicilio_rustico) ~ "Bom de Morar I", 
             any(onus_excessivo) | any(coabitacao_involuntaria) ~ "Bom de Morar II",
             TRUE ~ "Sem modalidade"
@@ -576,98 +761,61 @@ playProgramaBomDeMorar = function(infoFamily, SM, SUBSIDIO_MIN, SUBSIDIO_MAX, AL
     
     # Cálculo do comprometimento de Renda:
     infoFamily = infoFamily |> 
-        mutate(CR = case_when(
+        dplyr::mutate(CR = dplyr::case_when(
             d.vlr_renda_total_fam <= 1*SM                               ~ 0.15*d.vlr_renda_total_fam,
             d.vlr_renda_total_fam > 1*SM & d.vlr_renda_total_fam < 3*SM ~ (.1 + (d.vlr_renda_total_fam/SM)*0.05)*d.vlr_renda_total_fam,
             d.vlr_renda_total_fam == 3*SM                               ~ 0.25*d.vlr_renda_total_fam,
             TRUE                                                        ~ (.1 + (3)*0.05)*d.vlr_renda_total_fam
             )
         )
-    infoFamily = infoFamily |> mutate(CR = round(CR, 2))
+    infoFamily = infoFamily |> 
+        dplyr::mutate(CR = round(CR, 2))
     
     # Cálculo do subsidio max:
     infoFamily = infoFamily |> 
-        mutate(
+        dplyr::mutate(
             subsidio_max = ifelse(CR >= ALUGUEL_MAX, 0, max(SUBSIDIO_MIN, min(SUBSIDIO_MAX, ALUGUEL_MAX - CR)))
             )
     
     # Cálculo do aluguel max:
     infoFamily = infoFamily |> 
-        mutate(aluguel_max = min(ALUGUEL_MAX, CR + subsidio_max))
+        dplyr::mutate(aluguel_max = min(ALUGUEL_MAX, CR + subsidio_max))
     
     # Cálculo do aluguel min:
     infoFamily = infoFamily |> 
-        mutate(aluguel_min = min(ALUGUEL_MAX, CR + SUBSIDIO_MIN))
+        dplyr::mutate(aluguel_min = min(ALUGUEL_MAX, CR + SUBSIDIO_MIN))
     
     infoFamily
 }
 
 
+#' Lista de Imóveis Disponíveis
+#' 
+#' @description 
+#'  Função para selecionar os imóveis possíveis, dado o nível de comprometimento
+#'  de renda da família.
+#'  
+#'  @param cr comprometimento de renda
+#'  @param aluguel_up valor máximo de aluguel
+#'  @param aluguel_lw valor mínumo de aluguel
+#'  @param file_path path  do banco de dados de imóveis
+#'  
+#'  @export
 
-rendaTotalFam_SM <- function(d.vlr_renda_total_fam, 
-                             SM) {
-    round(d.vlr_renda_total_fam/SM, 2)
-}
-
-rendaMediaFam_SM <- function(d.vlr_renda_media_fam, 
-                             SM) {
-    round(d.vlr_renda_media_fam/SM, 2)
-}
-
-
-    
-# Função para calcular elegibilidade no programa:
-elegibilidadeFam <- function(vlr_renda_total_fam_SM, 
-                             vlr_renda_media_fam_SM) {
-    # CONDIÇÃO 1: Renda total da família menor ou igual a 3 SM?
-    cond1 = vlr_renda_total_fam_SM <= 3
-    # CONDIÇÃO 2: Renda total da família maior do que que 3 e menor ou igual a 5?
-    cond2 = vlr_renda_total_fam_SM > 3 & vlr_renda_total_fam_SM <= 5
-    # CONDIÇÃO 3: Renda média da família menor ou igual a 1 SM?
-    cond3 = vlr_renda_media_fam_SM <= 1
-    # família elegível?
-    res = fcase(
-        # Se Renda total da família menor ou igual a 3 SM, elegível; 
-        cond1, TRUE, 
-        # Se Renda total da família > 3 e <= 5 SM e a renda per capita nao superar 1 SM, elegível;
-        cond1 & cond2 & cond3, TRUE, 
-        default = FALSE)
-    res
-}
-
-# Função para calcular o valor do compromentimento máximo da renda familiar
-# em gasto de aluguel:
-compMaxRendaFam <- function(vlr_renda_total_fam_SM,
-                            SM) {
-    # fracao da renda total da família em termos de salário mínimo
-    x1 = vlr_renda_total_fam_SM
-    # comprometimento máximo da renda da família:
-    comp_max_renda_fam <- fcase(
-        x1 <= 0.5, 0.15*(vlr_renda_total_fam_SM*SM),
-        x1 > 0.5 & x1 < 3, (0.15 + x1*0.05)*(vlr_renda_total_fam_SM*SM),
-        default = 0.3*(vlr_renda_total_fam_SM*SM)
-    )
-    comp_max_renda_fam
-}
-
-# Função para selecionar os imóveis possíveis, dado o nível de comprometimento
-# de renda da família:
 listaImoveisDisp <- function(cr,
                              aluguel_up,#comp_renda_fam, 
                              aluguel_lw,#subsidio_max,
                              #subsidio_min,
                              file_path = "data/imoveis/") {
-    library(arrow)
-    library(dplyr)
     # Valor máximo de locação:
     #max_vlr_aluguel = comp_renda_fam + subsidio_max
     # querying parquet dataset:
-    imoveis_psb = open_dataset(file_path) %>% 
-        filter(preco_aluguel >= aluguel_lw & preco_aluguel <= aluguel_up) %>% 
-        collect()
+    imoveis_psb = arrow::open_dataset(file_path) %>% 
+        dplyr::filter(preco_aluguel >= aluguel_lw & preco_aluguel <= aluguel_up) %>% 
+        dplyr::collect()
     # calculando:
     imoveis_psb %>% 
-        mutate(
+        dplyr::mutate(
             comp_renda_fam = cr,
             #subsidio_max = subsidio_max,
             #subsidio_min = subsidio_min,
@@ -680,26 +828,35 @@ listaImoveisDisp <- function(cr,
         #    subsidio_max = NULL,
         #    subsidio_min = NULL
         #) %>% 
-        arrange(desc(subsidio_efetivo))
+        dplyr::arrange(dplyr::desc(subsidio_efetivo))
 }
 
+
+#' Plotar mapa com imóveis
+#' 
+#' @description 
+#' Essa função irá plotr o mapa com os imóveis.
+#' 
+#' @param imoveis banco de dados com os imóveis
+#' 
+#' @export
 
 plotMap <- function(imoveis) { 
     imoveis %>% 
         #head(10) %>% 
-        mutate(
+        dplyr::mutate(
             info = paste(
                 sep="<br/>", 
-                str_c("Aluguel: <b>R$ ", preco_aluguel, "</b>"),
-                str_c("Sudsídio: <b>R$ ", subsidio_efetivo, "</b>"),
+                stringr::str_c("Aluguel: <b>R$ ", preco_aluguel, "</b>"),
+                stringr::str_c("Sudsídio: <b>R$ ", subsidio_efetivo, "</b>"),
                 endereco,
-                str_c(andar, "° Andar"),
-                str_c("Área: ", round(area_m2), " M2")
+                stringr::str_c(andar, "° Andar"),
+                stringr::str_c("Área: ", round(area_m2), " M2")
                 )
         ) %>% 
-        leaflet() %>% 
-        addTiles() %>% 
-        addMarkers(
+        leaflet::leaflet(height=1000) %>% 
+        leaflet::addTiles() %>% 
+        leaflet::addMarkers(
             lng = ~lon, lat = ~lat, 
             popup = ~info,
             popupOptions = list(textsize="20px"),

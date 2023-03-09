@@ -1,3 +1,7 @@
+#' Consulta UI
+#' 
+#' @import shiny
+#' @import shinydashboard
 
 consultaUI <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
     ns = NS(id)
@@ -86,17 +90,21 @@ consultaUI <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
                 width = 12,
                 tabPanel(
                   title = tags$b("Mapa"),
-                  leafletOutput(outputId = ns("mapa"))
+                  leaflet::leafletOutput(outputId = ns("mapa"), height = 1000)
                 ),
                 tabPanel(
                     title = tags$b("Lista de Imóveis"),
-                    dataTableOutput(outputId = ns("resultado"))
+                    DT::dataTableOutput(outputId = ns("resultado"))
                 )
             )
         )
     )
 }
 
+#' Consulta Server
+#' 
+#' @import shiny
+#' @import shinydashboard
 consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
     moduleServer(
         id,
@@ -112,7 +120,7 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
                 req(input$cpf != "")
                 # Get CPF and clean it:
                 cpf = input$cpf
-                cpf = str_pad(cpf, 11, "left", "0")
+                cpf = stringr::str_pad(cpf, 11, "left", "0")
                 # Check elegibilidade:
                 res = checkElegibility_CPF(cpf)
                 # Se for elegível:
@@ -138,7 +146,7 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
             ############################# OUTPUT ###############################
             observeEvent(out()$resultado, {
                 if( out()$resultado == "inelegivel") {
-                    sendSweetAlert(
+                    shinyWidgets::sendSweetAlert(
                         session = session,
                         title = "Inelegível para o programa Bom de Morar",
                         text = tags$span(
@@ -146,7 +154,7 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
                                     style = "color: steelblue;"),
                             tags$b("Dispositivo:"),
                             tags$br(),
-                            str_replace_all(out()$dispositivo, "[[:space:]]", " "),
+                            stringr::str_replace_all(out()$dispositivo, "[[:space:]]", " "),
                             tags$br(),
                             tags$b(out()$motivo)
                         ),
@@ -162,7 +170,7 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
             output$nome_benef <- renderInfoBox({
                 req( out()$resultado == "elegivel" )
                 dt = out()$infoFamily |> 
-                    filter(p.num_cpf_pessoa == isolate(input$cpf))
+                    dplyr::filter(p.num_cpf_pessoa == isolate(input$cpf))
                 infoBox(
                   "Nome", 
                   dt$p.nom_pessoa[[1]],
@@ -175,7 +183,7 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
             output$nis_benef <- renderInfoBox({
                 req( out()$resultado == "elegivel" )
                 dt = out()$infoFamily |> 
-                    filter(p.num_cpf_pessoa == isolate(input$cpf))
+                    dplyr::filter(p.num_cpf_pessoa == isolate(input$cpf))
                 infoBox(
                     "NIS", dt$p.num_nis_pessoa_atual[[1]],
                     icon = icon("list", lib = "glyphicon"),
@@ -186,7 +194,7 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
             output$cod_familiar_benef <- renderInfoBox({
                 req( out()$resultado == "elegivel" )
                 dt = out()$infoFamily |> 
-                    filter(p.num_cpf_pessoa == isolate(input$cpf))
+                    dplyr::filter(p.num_cpf_pessoa == isolate(input$cpf))
                 infoBox(
                     "Código familiar (CADÚnico)", dt$d.cod_familiar_fam[[1]],
                     icon = icon("list", lib = "glyphicon"),
@@ -197,7 +205,7 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
             output$endereco_fam_benef <- renderInfoBox({
                 req( out()$resultado == "elegivel" )
                 dt = out()$infoFamily |> 
-                    filter(p.num_cpf_pessoa == isolate(input$cpf))
+                    dplyr::filter(p.num_cpf_pessoa == isolate(input$cpf))
                 tipo_logradouro = dt$d.nom_tip_logradouro_fam[[1]]
                 nome_logradouro = dt$d.nom_logradouro_fam[[1]]
                 numero_logradouro = dt$d.num_logradouro_fam[[1]]
@@ -218,7 +226,7 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
             output$num_integ_fam_benef <- renderInfoBox({
                 req( out()$resultado == "elegivel" )
                 # Calculando numero de integrantes na familia:
-                n_integrantes <- n_distinct(out()$infoFamily$p.num_nis_pessoa_atual)
+                n_integrantes <- dplyr::n_distinct(out()$infoFamily$p.num_nis_pessoa_atual)
                 infoBox(
                     "Número de Integrantes na Família",
                     n_integrantes,
@@ -263,7 +271,7 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
                 req( out()$resultado == "elegivel" )
                 infoBox(
                     "Número de Imóveis Disponíveis",
-                    n_distinct(out()$listaImoveis$apt_id),
+                    dplyr::n_distinct(out()$listaImoveis$apt_id),
                     icon = icon("building", lib = "font-awesome", verify_fa = F),
                     color = "blue"
                  )
@@ -301,13 +309,13 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
             })
             
             # Tabela com os imóveis
-            output$resultado <- renderDataTable({
+            output$resultado <- DT::renderDataTable({
                 req( out()$resultado == "elegivel" )
                 out()$listaImoveis
             })
             
             # Mapa:
-            output$mapa <- renderLeaflet({
+            output$mapa <- leaflet::renderLeaflet({
                 req( out()$resultado == "elegivel" )
                 out()$listaImoveis %>%
                    plotMap()
@@ -316,11 +324,13 @@ consultaServer <- function(id, SM, subsidio_min, subsidio_max, aluguel_max) {
     )
 }
 
-
+#' Consulta App
+#' 
+#' @import shiny
 consultaApp = function() {
     ui = fluidPage(
         shinyjs::useShinyjs(),
-        useSweetAlert(),
+        shinyWidgets::useSweetAlert(),
         consultaUI(id = "id1", SM = 1212, subsidio_min = 50, subsidio_max = 600, aluguel_max = 1000)
     )
     server = function(input, output, session){

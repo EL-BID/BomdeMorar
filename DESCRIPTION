@@ -1,0 +1,26 @@
+Package: BomDeMorarPCR
+Version: 0.0.10
+Author: Cleyton Farias <cleytonfarias@outlook.com>, Rubens Lopes <lps.rubens@gmail.com>
+Maintainer: Cleyton Farias <cleytonfarias@outlook.com>
+Encoding: UTF-8
+License: MIT + file LICENSE
+Imports:
+    shiny,
+    shinydashboard,
+    shinydashboardPlus,
+    shinyWidgets,
+    shinyjs,
+    waiter,
+    DT,
+    leaflet,
+    data.table,
+    dplyr,
+    purrr,
+    tidyr,
+    stringr,
+    lubridate,
+    pkgload
+RoxygenNote: 7.2.3
+Depends: 
+    R (>= 2.10)
+LazyData: true
